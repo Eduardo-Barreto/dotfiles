@@ -20,12 +20,18 @@ set -x PATH $PATH $PLATFORMIO_PATH
 set -x PATH $PATH $SCRIPTS_PATH
 
 # Configura o editor padrão
-set -x VISUAL /usr/bin/gedit
-set -x EDITOR /usr/bin/gedit
+set -x VISUAL nvim
+set -x EDITOR nvim
+
+# ROS
+set -x RMW_IMPLEMENTATION rmw_cyclonedds_cpp
+set -x TURTLEBOT3_MODEL burger
+set -x ROS_DOMAIN_ID 231
+set -x LDS_MODEL LDS_02
 
 # set -x TERM screen-256color
 # Atalhos (abreviações) úteis
-abbr nvim 'nvim ./'
+abbr vim 'nvim ./'
 abbr :q exit
 abbr :Q exit
 abbr install 'sudo apt install -y'
@@ -40,7 +46,6 @@ abbr cd.. 'cd ..'
 abbr reload 'source ~/.config/fish/config.fish'
 abbr python python3
 abbr py python
-abbr term 'nvim ~/.config/fish/config.fish'
 abbr venv 'python3 -m venv env'
 abbr activate 'source ./*env/bin/activate.fish'
 abbr cpwd 'pwd && pwd | xclip -selection clipboard'
@@ -51,21 +56,61 @@ abbr programmer_cube '$CUBE_PROGRAMMER_PATH/STM32CubeProgrammer'
 abbr remake 'make clean_cube && make clean_all && cd .. && rm -rf build && mkdir build && cd build && cmake ..'
 abbr old_remake 'make clean_all clean_cube clean cube prepare; make -j'
 abbr thunder 'cd ~/ThunderProjetos/'
-abbr vim nvim
 abbr ls exa
 abbr ll 'exa -alh'
 abbr bat batcat
 abbr fzfc 'fzf | xclip -selection clipboard'
-abbr cnvim 'cd ~/.config/nvim && nvim'
-abbr ckitty 'cd ~/.config/kitty && nvim'
+abbr term 'nvim ~/.config/fish/config.fish'
+abbr cnvim 'nvim ~/.config/nvim'
+abbr ckitty 'nvim ~/.config/kitty'
+abbr va 'nvim a.md'
+abbr s 'search'
+abbr coin 'toss-a-coin'
+abbr lg 'lazygit'
+abbr ros 'bass source /opt/ros/humble/setup.sh'
+
+# Layers
+function layers
+    alias rid 'cd ~/Layers/layers-core-id && nvm use && yarn start'
+    alias rcw 'cd ~/Layers/layers-core-app-web && nvm use && yarn start'
+    alias rcb 'cd ~/Layers/layers-core-backend && docker-compose up -d && nvm use && yarn start'
+    alias rfreqf 'cd ~/Layers/layers-frequencia/server/functions && nvm use && yarn serve'
+    alias rfreqw 'cd ~/Layers/layers-frequencia/web && nvm use && yarn start'
+
+    alias lcore 'cd ~/Layers/ && fish launch_core.sh'
+    alias lfreq 'cd ~/Layers/ && fish launch_frequencia.sh'
+
+    # help show all abbreviations and apps
+    function lhelp
+        echo 'rid -> Run Layers Core ID'
+        echo 'rcw -> Run Layers Core App Web'
+        echo 'rcb -> Run Layers Core Backend'
+        echo 'rfreq -> Run Layers Frequência'
+
+        echo ''
+
+        echo 'lcore -> Launch layers-core applications'
+        echo 'lfreq -> Launch layers-frequencia applications'
+    end
+
+    lhelp
+    cd ~/Layers
+end
 
 # Aliases
 alias bat=batcat
+alias tetris=/snap/bin/tetris-thefenriswolf.tetris 
 
 # Configura atalhos para executar scripts Python no diretório $HOME/scripts
 for file in $HOME/scripts/*.py
     set name (basename "$file" .py)
-    abbr -a $name "python3 \"$file\""
+    alias $name="python3 \"$file\""
+end
+
+# Configura atalhos para executar workflows do kitty
+for file in $HOME/.config/kitty/workflows/*.sh
+        set name (basename "$file" .sh)
+    alias $name="source \"$file\""
 end
 
 # Funções personalizadas
@@ -149,11 +194,12 @@ function cube
                 show_help
                 return
             case *
+                echo "Erro: Argumento inválido: $arg"
                 set project_path $arg
         end
     end
 
-    if test -z "$project_path"
+    if not test -f "$project_path"
         set project_path (find_ioc)
     end
 
@@ -182,21 +228,20 @@ function cube
     end
 end
 
-# Abre o repositório remoto no navegador
+# Abre o repositório remoto na branch atual no navegador
 function open-remote
     set origin_url (git remote get-url origin)
     set repo_url (string match -r 'github\.com[:/](.*)\.git' $origin_url)[2]
+    set branch_name (git symbolic-ref --short HEAD)
 
-    set url "https://github.com/$repo_url"
-
-    if test -n "$url"
-        echo "Abrindo repositório remoto no navegador: $url"
+    if test -n "$repo_url" -a -n "$branch_name"
+        set url "https://github.com/$repo_url/tree/$branch_name"
+        echo "Abrindo repositório remoto na branch atual no navegador: $url"
         open $url
     else
-        echo "Não foi possível determinar o link remoto."
+        echo "Não foi possível determinar o link remoto ou a branch atual."
     end
 end
-
 
 # Função para gerar o link do Seafile.
 # Uso: seafile-link <caminho_do_arquivo>
@@ -255,19 +300,32 @@ function seafile-fzf
     end
 end
 
+function launch 
+    nohup $argv &>/dev/null & disown; exit
+end
+
+
 # Comandos adicionais
 eval "$(pyenv init -)"
+zoxide init fish | source
 
 # Plugins
 fundle plugin 'jorgebucaran/nvm.fish'
 fundle plugin 'ilancosman/tide@v6'
 fundle plugin 'patrickf1/fzf.fish'
-fundle plugin 'jorgebucaran/autopair.fish'
 fundle plugin 'nickeb96/puffer-fish'
 fundle plugin 'lig/fish-gitmoji' --url 'https://codeberg.org/lig/fish-gitmoji.git'
+fundle plugin 'edc/bass'
 
 fundle init
 
 # Keybindings
 fzf_configure_bindings --directory=\cf
 fzf_configure_bindings --variables=\c\sv
+
+# pnpm
+set -gx PNPM_HOME "/home/eduardo-barreto/.local/share/pnpm"
+if not string match -q -- $PNPM_HOME $PATH
+  set -gx PATH "$PNPM_HOME" $PATH
+end
+# pnpm end
