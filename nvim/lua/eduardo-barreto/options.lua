@@ -47,3 +47,14 @@ vim.cmd("command! W :w")
 -- Add :Q command equals :q
 vim.cmd("command! Q :q")
 
+vim.cmd("command! Wq :wq")
+
+vim.cmd("command! WQ :wq")
+
+vim.cmd("command! Wqa :wqa")
+
+vim.cmd("command! WQa :wqa")
+
+vim.cmd("command! Qa :qa")
+
+vim.cmd("command! Rename lua vim.lsp.buf.rename()")

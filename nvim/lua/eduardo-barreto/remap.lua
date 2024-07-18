@@ -14,7 +14,8 @@ vim.keymap.set("n", "d", '"_d', { desc = "Delete character" })
 vim.keymap.set("v", "D", '"_D', { desc = "Delete line" })
 vim.keymap.set("v", "D", '"_D', { desc = "Delete line" })
 
-vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = "Replace current" })
+vim.keymap.set("n", "<leader>s", [[:%s/<C-r><C-w>/<C-r><C-w>/gIc<Left><Left><Left>]], { desc = "Replace current" })
+vim.keymap.set("n", "<leader>vs", [[:%s/<C-r>0/<C-r>0/gIc<Left><Left><Left>]], { desc = "Replace current" })
 
 vim.keymap.set("n", "<C-Up>", ":resize -2<CR>", { desc = "Resize vertical -2" })
 vim.keymap.set("n", "<C-Down>", ":resize +2<CR>", { desc = "Resize vertical +2" })

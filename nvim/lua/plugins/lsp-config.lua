@@ -10,6 +10,7 @@ local servers = {
     "marksman",
     "ruff_lsp",
     "pyright",
+    "tailwindcss"
 }
 
 local function lsp_highlight_document(client)
