@@ -10,7 +10,7 @@ local servers = {
     "marksman",
     "ruff_lsp",
     "pyright",
-    "tailwindcss"
+    "tailwindcss",
 }
 
 local function lsp_highlight_document(client)
@@ -138,7 +138,7 @@ return {
                 lspconfig[server].setup(opts)
             end
 
-            require("lspconfig").clangd.setup({
+            lspconfig.clangd.setup({
                 on_attach = on_attach,
                 capabilities = cmp_nvim_lsp.default_capabilities(),
                 cmd = {
@@ -146,6 +146,26 @@ return {
                     "--offset-encoding=utf-16",
                 },
             })
+
+            local mason_registry = require('mason-registry')
+            local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() ..
+                '/node_modules/@vue/language-server'
+
+            lspconfig.tsserver.setup {
+                init_options = {
+                    plugins = {
+                        {
+                            name = '@vue/typescript-plugin',
+                            location = vue_language_server_path,
+                            languages = { 'vue' },
+                        },
+                    },
+                },
+                filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
+            }
+
+            -- No need to set `hybridMode` to `true` as it's the default value
+            lspconfig.volar.setup {}
         end,
     },
 }

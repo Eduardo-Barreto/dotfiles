@@ -1,10 +1,14 @@
 #!/bin/zsh
 
-kitten @ set-tab-title "Frequencia"
+source ~/.zshrc
+kitten @ set-tab-title "Run Frequencia"
 
 echo "Running web"
-kitty @ new-window --cwd ~/Layers/layers-frequencia/web zsh -c "layers && rfreqw; exec zsh"
+kitty @ new-window --cwd ~/Layers/layers-frequencia/web zsh -c "source ~/.zshrc && nvm use && yarn start; exec zsh"
 
 echo "Running functions"
-layers
-rfreqf
+cd ~/Layers/layers-frequencia/server/functions
+
+nvm use
+yarn serve
+
