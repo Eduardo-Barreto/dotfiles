@@ -85,6 +85,7 @@ plugins=(
     fzf-tab
     zsh-syntax-highlighting
     zsh-autosuggestions
+    web-search
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -143,6 +144,7 @@ export RMW_IMPLEMENTATION="rmw_cyclonedds_cpp"
 export TURTLEBOT3_MODEL="burger"
 export ROS_DOMAIN_ID="231"
 export LDS_MODEL="LDS_02"
+export ROS_DISTRO="jazzy"
 
 # ALIASES
 alias vim='nvim'
@@ -160,7 +162,7 @@ alias cd..='cd ..'
 alias reload='source ~/.zshrc'
 alias python='python3'
 alias py='python'
-alias venv='python3 -m venv env'
+alias venv='uv venv env'
 alias activate='source ./*env/bin/activate'
 alias cpwd='pwd && pwd | xclip -selection clipboard'
 alias copy='xclip -selection clipboard'
@@ -181,9 +183,11 @@ alias va='nvim a.md'
 alias s='search'
 alias coin='toss-a-coin'
 alias lg='lazygit'
-alias ros='source /opt/ros/humble/setup.sh'
+alias ros='source /opt/ros/jazzy/setup.zsh'
 alias req='pip install -r requirements.txt'
 alias gmoji='gitmoji -s'
+alias godot='/home/eduardo-barreto/Apps/Godot_v4.3-stable_linux.x86_64 & disown; exit'
+alias pip='uv pip'
 
 
 # Funções
@@ -379,5 +383,37 @@ function launch() {
     nohup "$@" &>/dev/null & disown
 }
 
+webm_mp4() {
+    if [ $# -eq 0 ]; then
+        echo "Uso: webm_mp4 <arquivo.webm>"
+        return 1
+    fi
+
+    for file in "$@"; do
+        if [[ $file == *.webm ]]; then
+            output="${file%.webm}.mp4"
+            ffmpeg -i "$file" -c:v libx264 -c:a aac "$output"
+            echo "Convertido: $file -> $output"
+        else
+            echo "O arquivo $file não é um .webm"
+        fi
+    done
+}
+
+cvt_last() {
+    dir="/home/eduardo-barreto/Videos/Screencasts"
+
+    last_webm=$(ls -t "$dir"/*.webm 2>/dev/null | head -n 1)
+
+    if [ -z "$last_webm" ]; then
+        echo "Nenhum arquivo .webm encontrado no diretório $dir"
+        return 1
+    fi
+
+    webm_mp4 "$last_webm"
+}
+
 eval "$(zoxide init zsh)"
+eval "$(register-python-argcomplete ros2)"
+eval "$(register-python-argcomplete colcon)"
 

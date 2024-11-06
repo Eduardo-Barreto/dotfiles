@@ -6,7 +6,7 @@ local servers = {
     "cmake",
     "html",
     "jsonls",
-    "tsserver",
+    "ts_ls",
     "marksman",
     "ruff_lsp",
     "pyright",
@@ -151,7 +151,7 @@ return {
             local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() ..
                 '/node_modules/@vue/language-server'
 
-            lspconfig.tsserver.setup {
+            lspconfig.ts_ls.setup {
                 init_options = {
                     plugins = {
                         {

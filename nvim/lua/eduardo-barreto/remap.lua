@@ -34,3 +34,6 @@ vim.keymap.set("n", "<C-s>", ":w<CR>", { desc = "Save" })
 
 vim.keymap.set("n", "<leader>h", ":vspl<CR>", { desc = "Horizontal split" })
 vim.keymap.set("n", "<leader>v", ":spl<CR>", { desc = "Vertical split" })
+
+vim.keymap.set("n", "<leader>ff", ":Neoformat<CR>", { desc = "Format" })
+
