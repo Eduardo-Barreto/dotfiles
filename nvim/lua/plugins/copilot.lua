@@ -17,6 +17,7 @@ return {
             },
             filetypes = {
                 markdown = true,
+                yaml = true,
             },
         })
     end,
