@@ -142,7 +142,7 @@ export EDITOR="nvim"
 
 export RMW_IMPLEMENTATION="rmw_cyclonedds_cpp"
 export TURTLEBOT3_MODEL="burger"
-export ROS_DOMAIN_ID="231"
+export ROS_DOMAIN_ID="44"
 export LDS_MODEL="LDS_02"
 export ROS_DISTRO="jazzy"
 
