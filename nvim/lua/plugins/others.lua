@@ -40,5 +40,8 @@ return {
 
     {
         'sbdchd/neoformat'
+    },
+    {
+        'tpope/vim-surround'
     }
 }
