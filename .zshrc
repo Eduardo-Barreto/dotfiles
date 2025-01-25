@@ -86,6 +86,7 @@ plugins=(
     zsh-syntax-highlighting
     zsh-autosuggestions
     web-search
+    docker
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -134,8 +135,9 @@ export CUBE_PROGRAMMER_PATH="$SHARED_PATH/Linux/STM/Programmer/bin"
 export PLATFORMIO_PATH="/home/eduardo-barreto/.platformio/penv/bin"
 export SCRIPTS_PATH="/home/eduardo-barreto/scripts"
 export LOCAL_BIN_PATH="/home/eduardo-barreto/.local/bin"
+export GO_PATH="/usr/local/go/bin"
 
-export PATH="$PATH:$ARM_GCC_PATH:$CUBE_PROGRAMMER_PATH:$CARGO_PATH:$PLATFORMIO_PATH:$SCRIPTS_PATH:$LOCAL_BIN_PATH"
+export PATH="$PATH:$ARM_GCC_PATH:$CUBE_PROGRAMMER_PATH:$CARGO_PATH:$PLATFORMIO_PATH:$SCRIPTS_PATH:$LOCAL_BIN_PATH:$GO_PATH"
 
 export VISUAL="nvim"
 export EDITOR="nvim"
@@ -185,12 +187,51 @@ alias coin='toss-a-coin'
 alias lg='lazygit'
 alias ros='source /opt/ros/jazzy/setup.zsh'
 alias req='pip install -r requirements.txt'
-alias gmoji='gitmoji -s'
 alias godot='/home/eduardo-barreto/Apps/Godot_v4.3-stable_linux.x86_64 & disown; exit'
 alias pip='uv pip'
+alias membros_comp='vim ~/membros_comp.md'
+alias notify='notify-send Finalizado acabou'
 
+function reclone() {
+    repo_url=$(git remote get-url origin)
+    branch_name=$(git symbolic-ref --short HEAD)
+    repo_directory=$(pwd)
+
+    if [ -n "$repo_url" ] && [ -n "$branch_name" ]; then
+        cd ..
+        rm -rf $repo_directory
+        git clone $repo_url
+        cd $repo_directory
+        git checkout $branch_name
+        git pull
+    else
+        echo "Não foi possível determinar o link remoto ou a branch atual."
+    fi
+}
 
 # Funções
+function alert() {
+    local last_command_status=$?
+    local icon
+    local title
+    local message
+
+    # Define ícone e título com base no status do último comando
+    if [ $last_command_status -eq 0 ]; then
+        icon="dialog-information"
+        title="✅ Sucesso"
+    else
+        icon="dialog-error"
+        title="❌ Erro"
+    fi
+
+    # Pega o último comando sem metadados e remove "; alert"
+    message=$(tail -n1 ~/.zsh_history | sed -E 's/^.*;([^;]+)\; alert$/\1/')
+
+    # Envia a notificação
+    notify-send -i "$icon" "$title" "$message"
+}
+
 function layers() {
     alias rid='cd ~/Layers/layers-core-id && nvm use && yarn start'
     alias rcw='cd ~/Layers/layers-core-app-web && nvm use && yarn start'
@@ -383,7 +424,7 @@ function launch() {
     nohup "$@" &>/dev/null & disown
 }
 
-webm_mp4() {
+function webm_mp4() {
     if [ $# -eq 0 ]; then
         echo "Uso: webm_mp4 <arquivo.webm>"
         return 1
@@ -400,10 +441,10 @@ webm_mp4() {
     done
 }
 
-cvt_last() {
-    dir="/home/eduardo-barreto/Videos/Screencasts"
+function cvt_last() {
+    lookdir="/home/eduardo-barreto/Videos/Screencasts"
 
-    last_webm=$(ls -t "$dir"/*.webm 2>/dev/null | head -n 1)
+    last_webm=$(ls "$lookdir"/*.webm -snew 2>/dev/null | head -n 1 | tr -d "'")
 
     if [ -z "$last_webm" ]; then
         echo "Nenhum arquivo .webm encontrado no diretório $dir"
@@ -411,6 +452,93 @@ cvt_last() {
     fi
 
     webm_mp4 "$last_webm"
+}
+
+# generate with
+# curl -L https://github.com/carloscuesta/gitmoji/raw/master/packages/gitmojis/src/gitmojis.json|jq -r '.gitmojis[] | "\(.emoji):\(.description)"'
+
+gitmojis=$(cat << EOF
+🎨: (art) Improve structure / format of the code.
+⚡️: (zap) Improve performance.
+🔥: (fire) Remove code or files.
+🐛: (bug) Fix a bug.
+🚑️: (ambulance) Critical hotfix.
+✨: (sparkles) Introduce new features.
+📝: (memo) Add or update documentation.
+🚀: (rocket) Deploy stuff.
+💄: (lipstick) Add or update the UI and style files.
+🎉: (tada) Begin a project.
+✅: (white-check-mark) Add, update, or pass tests.
+🔒️: (lock) Fix security or privacy issues.
+🔐: (closed-lock-with-key) Add or update secrets.
+🔖: (bookmark) Release / Version tags.
+🚨: (rotating-light) Fix compiler / linter warnings.
+🚧: (construction) Work in progress.
+💚: (green-heart) Fix CI Build.
+⬇️: (arrow-down) Downgrade dependencies.
+⬆️: (arrow-up) Upgrade dependencies.
+📌: (pushpin) Pin dependencies to specific versions.
+👷: (construction-worker) Add or update CI build system.
+📈: (chart-with-upwards-trend) Add or update analytics or track code.
+♻️: (recycle) Refactor code.
+➕: (heavy-plus-sign) Add a dependency.
+➖: (heavy-minus-sign) Remove a dependency.
+🔧: (wrench) Add or update configuration files.
+🔨: (hammer) Add or update development scripts.
+🌐: (globe-with-meridians) Internationalization and localization.
+✏️: (pencil2) Fix typos.
+💩: (poop) Write bad code that needs to be improved.
+⏪️: (rewind) Revert changes.
+🔀: (twisted-rightwards-arrows) Merge branches.
+📦️: (package) Add or update compiled files or packages.
+👽️: (alien) Update code due to external API changes.
+🚚: (truck) Move or rename resources (e.g.: files, paths, routes).
+📄: (page-facing-up) Add or update license.
+💥: (boom) Introduce breaking changes.
+🍱: (bento) Add or update assets.
+♿️: (wheelchair) Improve accessibility.
+💡: (bulb) Add or update comments in source code.
+🍻: (beers) Write code drunkenly.
+💬: (speech-balloon) Add or update text and literals.
+🗃️: (card-file-box) Perform database related changes.
+🔊: (loud-sound) Add or update logs.
+🔇: (mute) Remove logs.
+👥: (busts-in-silhouette) Add or update contributor(s).
+🚸: (children-crossing) Improve user experience / usability.
+🏗️: (building-construction) Make architectural changes.
+📱: (iphone) Work on responsive design.
+🤡: (clown-face) Mock things.
+🥚: (egg) Add or update an easter egg.
+🙈: (see-no-evil) Add or update a .gitignore file.
+📸: (camera-flash) Add or update snapshots.
+⚗️: (alembic) Perform experiments.
+🔍️: (mag) Improve SEO.
+🏷️: (label) Add or update types.
+🌱: (seedling) Add or update seed files.
+🚩: (triangular-flag-on-post) Add, update, or remove feature flags.
+🥅: (goal-net) Catch errors.
+💫: (dizzy) Add or update animations and transitions.
+🗑️: (wastebasket) Deprecate code that needs to be cleaned up.
+🛂: (passport-control) Work on code related to authorization, roles and permissions.
+🩹: (adhesive-bandage) Simple fix for a non-critical issue.
+🧐: (monocle-face) Data exploration/inspection.
+⚰️: (coffin) Remove dead code.
+🧪: (test-tube) Add a failing test.
+👔: (necktie) Add or update business logic.
+🩺: (stethoscope) Add or update healthcheck.
+🧱: (bricks) Infrastructure related changes.
+🧑‍💻: (technologist) Improve developer experience.
+💸: (money-with-wings) Add sponsorships or money related infrastructure.
+🧵: (thread) Add or update code related to multithreading or concurrency.
+🦺: (safety-vest) Add or update code related to validation.
+EOF
+)
+
+function gitmoji() {
+    emoji=$(echo $gitmojis | fzf | cut -d: -f1)
+	if [[ -n "$emoji" ]]; then
+        printf "%s" "$emoji " | copy
+	fi
 }
 
 eval "$(zoxide init zsh)"
