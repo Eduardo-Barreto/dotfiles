@@ -8,9 +8,10 @@ local servers = {
     "jsonls",
     "ts_ls",
     "marksman",
-    "ruff_lsp",
+    "ruff",
     "pyright",
     "tailwindcss",
+    "gopls"
 }
 
 local function lsp_highlight_document(client)
@@ -137,6 +138,24 @@ return {
 
                 lspconfig[server].setup(opts)
             end
+
+            lspconfig.lua_ls.setup({
+                on_attach = on_attach,
+                capabilities = cmp_nvim_lsp.default_capabilities(),
+                settings = {
+                    Lua = {
+                        diagnostics = {
+                            globals = { "vim" },
+                        },
+                        workspace = {
+                            library = {
+                                [vim.fn.expand("$VIMRUNTIME/lua")] = true,
+                                [vim.fn.expand("$VIMRUNTIME/lua/vim/lsp")] = true,
+                            },
+                        },
+                    },
+                },
+            })
 
             lspconfig.clangd.setup({
                 on_attach = on_attach,
