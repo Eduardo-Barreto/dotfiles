@@ -1,3 +1,7 @@
+if [[ "$ZPROF" = true ]]; then
+  zmodload zsh/zprof
+fi
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -80,12 +84,10 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
     git
-    nvm
     fzf
     fzf-tab
     zsh-syntax-highlighting
     zsh-autosuggestions
-    web-search
     docker
 )
 
@@ -131,6 +133,7 @@ export SHARED_PATH="/mnt/640E7B160E7AE08A"
 # export ARM_GCC_PATH="/opt/arm-none-eabi/gcc-arm-none-eabi-10.3-2021.10/bin"
 export ARM_GCC_PATH="/usr/bin/arm-none-eabi-gcc"
 export CUBE_PATH="$SHARED_PATH/Linux/STM/CubeMX"
+export CUBE_CMD="$SHARED_PATH/Linux/STM/CubeMX/STM32CubeMX"
 export CUBE_PROGRAMMER_PATH="$SHARED_PATH/Linux/STM/Programmer/bin"
 export PLATFORMIO_PATH="/home/eduardo-barreto/.platformio/penv/bin"
 export SCRIPTS_PATH="/home/eduardo-barreto/scripts"
@@ -173,10 +176,11 @@ alias submodule='git submodule update --init --recursive'
 alias programmer_cube='$CUBE_PROGRAMMER_PATH/STM32CubeProgrammer'
 alias remake='make clean_cube && make clean_all && cd .. && rm -rf build && mkdir build && cd build && cmake ..'
 alias old_remake='make clean_all clean_cube clean cube prepare; make -j'
-alias thunder='cd ~/ThunderProjetos/'
+alias thunder='cd ~/Thunder/'
 alias ls='eza'
 alias ll='eza -alh'
 alias bat='batcat'
+alias b='bat'
 alias fzfc='fzf | xclip -selection clipboard'
 alias term='nvim ~/.zshrc'
 alias cnvim='nvim ~/.config/nvim'
@@ -191,6 +195,12 @@ alias godot='/home/eduardo-barreto/Apps/Godot_v4.3-stable_linux.x86_64 & disown;
 alias pip='uv pip'
 alias membros_comp='vim ~/membros_comp.md'
 alias notify='notify-send Finalizado acabou'
+alias upload='curl bashupload.com -T '
+alias shared='cd $SHARED_PATH'
+alias nvm='fnm'
+alias gj='gitmoji'
+alias notes='nvim ~/notes/'
+alias todo='nvim ~/notes/todo.md'
 
 function reclone() {
     repo_url=$(git remote get-url origin)
@@ -280,6 +290,19 @@ function compile_c() {
 function take() {
     mkdir -p "$1"
     cd "$1"
+}
+
+function tamper(){
+    file_path=$1
+    mkdir -p "$(dirname "$file_path")" && touch "$file_path"
+}
+
+# Função para apagar o diretório atual e recriá-lo
+function retake(){
+    dir=$(basename "$(pwd)")
+    cd ..
+    rm -rf "$dir"
+    take "$dir"
 }
 
 # Função para clonar repositório e navegar até ele
@@ -541,7 +564,82 @@ function gitmoji() {
 	fi
 }
 
-eval "$(zoxide init zsh)"
-eval "$(register-python-argcomplete ros2)"
-eval "$(register-python-argcomplete colcon)"
+function send() {
+    if [[ -z "$1" ]]; then
+        echo "Erro: Por favor, informe o caminho do arquivo."
+        return 1
+    fi
 
+    if [[ ! -f "$1" ]]; then
+        echo "Erro: O arquivo '$1' não existe."
+        return 1
+    fi
+
+    sendme send "$1" | while read -r line; do
+        if [[ "$line" =~ "sendme receive" ]]; then
+            receive_command=$(echo "$line" | grep -o 'sendme receive [^ ]*')
+
+            echo -n "$receive_command" | copy
+
+            echo "$receive_command"
+            break
+        fi
+    done
+}
+
+function generate_compile_commands() {
+  mkdir -p build
+  
+  make clean
+
+  local make_output=$(make -nw 2>&1 | jq -R -s .)
+
+  local response=$(curl -s -X POST "https://texttoolkit.com/compilation-database-generator" \
+    -H "Content-Type: application/json" \
+    --data-raw "{\"input\":${make_output},\"replaces\":[],\"output\":\"\\n\"}")
+
+  echo "$response" > build/compile_commands.json
+
+  sed -i 's/\\"/"/g' build/compile_commands.json
+  sed -i 's/"\[/[/g' build/compile_commands.json
+  sed -i 's/\]"/]/g' build/compile_commands.json
+
+  echo $(cat build/compile_commands.json | jq '.output') > build/compile_commands.json
+
+  echo "compile_commands.json gerado em build/"
+}
+
+
+zshprof() {
+  shell=${1-$SHELL}
+  ZPROF=true $shell -i -c exit
+}
+
+
+eval "$(zoxide init zsh)"
+# eval "$(register-python-argcomplete ros2)"
+# eval "$(register-python-argcomplete colcon)"
+
+source ~/powerlevel10k/powerlevel10k.zsh-theme
+
+# Generated for envman. Do not edit.
+# [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
+
+
+if [[ "$ZPROF" = true ]]; then
+  zprof
+fi
+
+# fnm
+FNM_PATH="/home/eduardo-barreto/.local/share/fnm"
+if [ -d "$FNM_PATH" ]; then
+  export PATH="/home/eduardo-barreto/.local/share/fnm:$PATH"
+  eval "`fnm env --use-on-cd --version-file-strategy=recursive`"
+fi
+
+# bun completions
+[ -s "/home/eduardo-barreto/.bun/_bun" ] && source "/home/eduardo-barreto/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
