@@ -8,6 +8,11 @@ return {
                 undotree = { text = "undotree" },
                 Outline = { text = "symbols-outline" },
             },
+            sort = {
+                ignore_case = true
+            },
+            animation = true,
+            tabpages = true
         })
     end,
 }
