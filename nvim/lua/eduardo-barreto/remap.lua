@@ -37,3 +37,7 @@ vim.keymap.set("n", "<leader>v", ":spl<CR>", { desc = "Vertical split" })
 
 vim.keymap.set("n", "<leader>ff", ":Neoformat<CR>", { desc = "Format" })
 
+vim.keymap.set("n", "<M-.>", "<C-a>", { desc = "increment number" })
+vim.keymap.set("n", "<M-,>", "<C-x>", { desc = "decrement number" })
+vim.keymap.set("x", "<M-.>", "g<C-a>", { desc = "increment number (cumulative)" })
+vim.keymap.set("x", "<M-,>", "g<C-x>", { desc = "decrement number (cumulative)" })
