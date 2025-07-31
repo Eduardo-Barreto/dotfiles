@@ -139,8 +139,10 @@ export PLATFORMIO_PATH="/home/eduardo-barreto/.platformio/penv/bin"
 export SCRIPTS_PATH="/home/eduardo-barreto/scripts"
 export LOCAL_BIN_PATH="/home/eduardo-barreto/.local/bin"
 export GO_PATH="/usr/local/go/bin"
+export GO_APPS_PATH="/home/eduardo-barreto/go/bin"
+export MUJOCO_PATH="/home/eduardo-barreto/.mujoco/mujoco-3.3.2/bin"
 
-export PATH="$PATH:$ARM_GCC_PATH:$CUBE_PROGRAMMER_PATH:$CARGO_PATH:$PLATFORMIO_PATH:$SCRIPTS_PATH:$LOCAL_BIN_PATH:$GO_PATH"
+export PATH="$PATH:$ARM_GCC_PATH:$CUBE_PROGRAMMER_PATH:$CARGO_PATH:$PLATFORMIO_PATH:$SCRIPTS_PATH:$LOCAL_BIN_PATH:$GO_PATH:$MUJOCO_PATH:$GO_APPS_PATH"
 
 export VISUAL="nvim"
 export EDITOR="nvim"
@@ -150,6 +152,8 @@ export TURTLEBOT3_MODEL="burger"
 export ROS_DOMAIN_ID="44"
 export LDS_MODEL="LDS_02"
 export ROS_DISTRO="jazzy"
+
+export GOOGLE_APPLICATION_CREDENTIALS="/home/eduardo-barreto/thor.json"
 
 # ALIASES
 alias vim='nvim'
@@ -181,11 +185,13 @@ alias ls='eza'
 alias ll='eza -alh'
 alias bat='batcat'
 alias b='bat'
-alias fzfc='fzf | xclip -selection clipboard'
+alias cfzf='fzf | xclip -selection clipboard'
+alias fzfc='cfzf'
 alias term='nvim ~/.zshrc'
 alias cnvim='nvim ~/.config/nvim'
 alias ckitty='nvim ~/.config/kitty'
 alias va='nvim a.md'
+alias vaj='nvim a.jsonc'
 alias s='search'
 alias coin='toss-a-coin'
 alias lg='lazygit'
@@ -201,6 +207,7 @@ alias nvm='fnm'
 alias gj='gitmoji'
 alias notes='nvim ~/notes/'
 alias todo='nvim ~/notes/todo.md'
+alias white="kitten icat 'https://img.freepik.com/premium-photo/abstract-blue-light-gradient-blurred-colorful-gradient-background_558873-57843.jpg?w=4000'"
 
 function reclone() {
     repo_url=$(git remote get-url origin)
@@ -589,7 +596,7 @@ function send() {
 
 function generate_compile_commands() {
   mkdir -p build
-  
+
   make clean
 
   local make_output=$(make -nw 2>&1 | jq -R -s .)
@@ -609,6 +616,33 @@ function generate_compile_commands() {
   echo "compile_commands.json gerado em build/"
 }
 
+function qrcode(){
+    # uses the clipboard text to generate an svg image of the qrcode
+    # qr --factory=svg-path "Some text"
+    # copies the image to the clipboard
+
+    if [[ -z "$1" ]]; then
+        echo "Uso: qrcode <texto>"
+        return 1
+    fi
+
+    local text="$1"
+    local svg_file="/home/eduardo-barreto/Pictures/qrcode.svg"
+
+    qr --factory=svg-path "$text" > "$svg_file"
+
+    if [[ $? -ne 0 ]]; then
+        echo "Erro ao gerar o QR Code."
+        return 1
+    fi
+
+    echo -n "$svg_file" | xclip -selection clipboard
+
+    echo "QR Code gerado e copiado para o clipboard: $svg_file"
+
+    return 0
+}
+
 
 zshprof() {
   shell=${1-$SHELL}
@@ -619,8 +653,6 @@ zshprof() {
 eval "$(zoxide init zsh)"
 # eval "$(register-python-argcomplete ros2)"
 # eval "$(register-python-argcomplete colcon)"
-
-source ~/powerlevel10k/powerlevel10k.zsh-theme
 
 # Generated for envman. Do not edit.
 # [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
@@ -643,3 +675,13 @@ fi
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+	rm -f -- "$tmp"
+}
+
+source ~/.zshrc.local
