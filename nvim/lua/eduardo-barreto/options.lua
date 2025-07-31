@@ -41,10 +41,8 @@ vim.opt.splitright = true
 vim.g.loaded_netrw = 1
 vim.g.netrwPlugin = 1
 
--- Add :W command equals :w
 vim.cmd("command! W :w")
 
--- Add :Q command equals :q
 vim.cmd("command! Q :q")
 
 vim.cmd("command! Wq :wq")
