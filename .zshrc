@@ -153,8 +153,6 @@ export ROS_DOMAIN_ID="44"
 export LDS_MODEL="LDS_02"
 export ROS_DISTRO="jazzy"
 
-export GOOGLE_APPLICATION_CREDENTIALS="/home/eduardo-barreto/thor.json"
-
 # ALIASES
 alias vim='nvim'
 alias :q='exit'
@@ -247,30 +245,6 @@ function alert() {
 
     # Envia a notificação
     notify-send -i "$icon" "$title" "$message"
-}
-
-function layers() {
-    alias rid='cd ~/Layers/layers-core-id && nvm use && yarn start'
-    alias rcw='cd ~/Layers/layers-core-app-web && nvm use && yarn start'
-    alias rcb='cd ~/Layers/layers-core-backend && docker-compose up -d && nvm use && yarn start'
-    alias rfreqf='cd ~/Layers/layers-frequencia/server/functions && nvm use && yarn serve'
-    alias rfreqw='cd ~/Layers/layers-frequencia/web && nvm use && yarn start'
-
-    alias lcore='cd ~/Layers/ && zsh ~/.config/kitty/workflows/layers_core.sh'
-    alias lfreq='cd ~/Layers/ && zsh ~/.config/kitty/workflows/layers_frequencia.sh'
-
-    function lhelp() {
-        echo 'rid -> Run Layers Core ID'
-        echo 'rcw -> Run Layers Core App Web'
-        echo 'rcb -> Run Layers Core Backend'
-        echo 'rfreq -> Run Layers Frequência'
-        echo ''
-        echo 'lcore -> Launch layers-core applications'
-        echo 'lfreq -> Launch layers-frequencia applications'
-    }
-
-    lhelp
-    cd ~/Layers
 }
 
 # Configura atalhos para executar scripts Python no diretório $HOME/scripts
