@@ -1,8 +1,9 @@
 return {
 	"nvim-treesitter/nvim-treesitter",
 	build = ":TSUpdate",
+    branch = 'main',
 	config = function()
-		local tree_sitter = require("nvim-treesitter.configs")
+		local tree_sitter = require("nvim-treesitter")
 		tree_sitter.setup({
 			ensure_installed = {
 				"javascript",

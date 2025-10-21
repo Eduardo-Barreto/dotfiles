@@ -123,7 +123,6 @@ return {
     {
         "neovim/nvim-lspconfig",
         config = function()
-            local lspconfig = require("lspconfig")
             local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
             local capabilities = cmp_nvim_lsp.default_capabilities()
@@ -136,10 +135,10 @@ return {
 
                 server = vim.split(server, "@")[1]
 
-                lspconfig[server].setup(opts)
+                vim.lsp.config(server, opts)
             end
 
-            lspconfig.lua_ls.setup({
+            vim.lsp.config('lua_ls', {
                 on_attach = on_attach,
                 capabilities = cmp_nvim_lsp.default_capabilities(),
                 settings = {
@@ -157,7 +156,7 @@ return {
                 },
             })
 
-            lspconfig.clangd.setup({
+            vim.lsp.config('clangd', {
                 on_attach = on_attach,
                 capabilities = cmp_nvim_lsp.default_capabilities(),
                 cmd = {
@@ -168,25 +167,9 @@ return {
                 },
             })
 
-            local mason_registry = require('mason-registry')
-            local vue_language_server_path = mason_registry.get_package('vue-language-server'):get_install_path() ..
-                '/node_modules/@vue/language-server'
-
-            lspconfig.ts_ls.setup {
-                init_options = {
-                    plugins = {
-                        {
-                            name = '@vue/typescript-plugin',
-                            location = vue_language_server_path,
-                            languages = { 'vue' },
-                        },
-                    },
-                },
+            vim.lsp.config('ts_ls', {
                 filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
-            }
-
-            -- No need to set `hybridMode` to `true` as it's the default value
-            lspconfig.volar.setup {}
+            })
         end,
     },
 }
