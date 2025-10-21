@@ -2,9 +2,10 @@ return {
 	{
 		"nvim-telescope/telescope-ui-select.nvim",
 	},
+    { 'nvim-telescope/telescope-fzf-native.nvim', run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release' },
 	{
 		"nvim-telescope/telescope.nvim",
-		tag = "0.1.5",
+        branch = "master",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			"nvim-telescope/telescope-live-grep-args.nvim",
@@ -19,7 +20,6 @@ return {
 			})
 			local telescope = require("telescope")
 			local builtin = require("telescope.builtin")
-			-- vim.keymap.set("n", "<leader>pf", builtin.find_files, { desc = "Find file" })
             vim.keymap.set("n", "<leader>pf", function()
                 builtin.find_files({ hidden = true })
             end, { desc = "Find file" })
