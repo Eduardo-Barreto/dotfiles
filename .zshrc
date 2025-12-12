@@ -131,7 +131,8 @@ export PATH="$PATH:/opt/nvim-linux64/bin"
 
 export SHARED_PATH="/mnt/640E7B160E7AE08A"
 # export ARM_GCC_PATH="/opt/arm-none-eabi/gcc-arm-none-eabi-10.3-2021.10/bin"
-export ARM_GCC_PATH="/usr/bin/arm-none-eabi-gcc"
+# export ARM_GCC_PATH="/usr/bin/arm-none-eabi-gcc"
+export ARM_GCC_PATH="/home/eduardo-barreto/Downloads/SimplicityStudio_v5/developer/toolchains/gnu_arm/10.3_2021.10/bin"
 export CUBE_PATH="$SHARED_PATH/Linux/STM/CubeMX"
 export CUBE_CMD="$SHARED_PATH/Linux/STM/CubeMX/STM32CubeMX"
 export CUBE_PROGRAMMER_PATH="$SHARED_PATH/Linux/STM/Programmer/bin"
@@ -206,6 +207,7 @@ alias gj='gitmoji'
 alias notes='nvim ~/notes/'
 alias todo='nvim ~/notes/todo.md'
 alias white="kitten icat 'https://img.freepik.com/premium-photo/abstract-blue-light-gradient-blurred-colorful-gradient-background_558873-57843.jpg?w=4000'"
+alias commander='~/Downloads/SimplicityStudio_v5/developer/adapter_packs/commander/commander'
 
 function reclone() {
     repo_url=$(git remote get-url origin)
@@ -378,7 +380,7 @@ function open_remote() {
     if [ -n "$repo_url" ] && [ -n "$branch_name" ]; then
         url="https://github.com/$repo_url/tree/$branch_name"
         echo "Abrindo repositório remoto na branch atual no navegador: $url"
-        open "$url"
+        xdg-open "$url"
     else
         echo "Não foi possível determinar o link remoto ou a branch atual."
     fi
@@ -659,3 +661,6 @@ function y() {
 }
 
 source ~/.zshrc.local
+eval "$(/usr/bin/mise activate zsh)"
+
+. "$HOME/.local/share/../bin/env"
