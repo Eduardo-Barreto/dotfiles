@@ -68,5 +68,12 @@ return {
       cmd = { "CsvViewEnable", "CsvViewDisable", "CsvViewToggle" },
     },
 
-    { "sindrets/diffview.nvim" }
+    { "sindrets/diffview.nvim" },
+
+    {
+        "kwakzalver/duckytype.nvim",
+        config = function()
+            require("duckytype").setup({})
+        end,
+    }
 }
